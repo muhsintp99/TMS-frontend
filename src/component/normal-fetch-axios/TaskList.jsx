@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { createTask, deleteTask, filterByPriority, filterByStatus, getTasks, updateTask } from './TaskApi';
 import DataTable from 'react-data-table-component';
-import { Box, TextField, Button, FormControl, InputLabel, MenuItem, Select, FormHelperText } from '@mui/material';
+import { Box, TextField, Button, FormControl, InputLabel, MenuItem, Select, FormHelperText, InputAdornment } from '@mui/material';
 import DateAndTime from '../../utils/DateAndTime';
 import * as Yup from 'yup';
 import { Formik, Form, Field } from 'formik';
 import { getPriorityStyle, getStatusStyle } from '../../utils/commen';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import DeleteModel from '../../utils/DeleteModel';
+import Search from '@mui/icons-material/Search';
+
 
 
 const TaskSchema = Yup.object().shape({
@@ -21,8 +24,14 @@ const TaskSchema = Yup.object().shape({
 const TaskList = () => {
     const [data, setData] = useState([]);
     const [editTask, setEditTask] = useState(null);
+    const [allData, setAllData] = useState([]);
     const [filterStatus, setFilterStatus] = useState('');
     const [filterPriority, setFilterPriority] = useState('');
+
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [selectedTaskId, setSelectedTaskId] = useState(null);
+
+
     const [initialValues, setInitialValues] = useState({
         title: '',
         description: '',
@@ -55,7 +64,11 @@ const TaskList = () => {
 
     const fetchTasks = () => {
         getTasks()
-            .then((res) => setData(res.data.reverse()))
+            .then((res) => {
+                const reserve = res.data.reverse()
+                setData(reserve)
+                setAllData(reserve)
+            })
             .catch((err) => console.log('err', err));
     };
 
@@ -93,15 +106,42 @@ const TaskList = () => {
         }
     };
 
-    const handleDelete = (id) => {
-        deleteTask(id)
+    const openDeleteModal = (id) => {
+        setSelectedTaskId(id);
+        setDeleteConfirmOpen(true);
+    };
+
+    // const handleDelete = (id) => {
+    //     deleteTask(id)
+    //         .then(() => {
+    //             fetchTasks();
+    //             console.log('Task Deleted Successfully');
+    //             toast.success('Task Deleted Successfully');
+    //         })
+    //         .catch((err) => console.log('Delete Error', err));
+    // };
+
+    const confirmDelete = () => {
+        deleteTask(selectedTaskId)
             .then(() => {
                 fetchTasks();
-                console.log('Task Deleted Successfully');
+                setDeleteConfirmOpen(false);
+                setSelectedTaskId(null);
                 toast.success('Task Deleted Successfully');
             })
             .catch((err) => console.log('Delete Error', err));
     };
+
+    const searchHandler = (e) => {
+        const searchValue = e.target.value.toLowerCase();
+        const filteredData = allData.filter((row) =>{
+            return(
+                row.title.toLowerCase().includes(searchValue)||
+                row.description.toLowerCase().includes(searchValue)
+            );
+        });
+        setData(filteredData);
+    }
 
     const columns = [
         {
@@ -162,7 +202,8 @@ const TaskList = () => {
                         Update
                     </Button>
                     <Button
-                        onClick={() => handleDelete(row._id)}
+                        // onClick={() => handleDelete(row._id)}
+                        onClick={() => openDeleteModal(row._id)}
                         variant="outlined"
                         color="error"
                     >
@@ -281,6 +322,23 @@ const TaskList = () => {
                     <Box>
                         <h2>Task List</h2>
                     </Box>
+                    <Box>
+                        <TextField
+                            sx={{ width: '100%', background: '#f0f0f0', borderRadius: '5px' }}
+                            placeholder="Search Here"
+                            variant="outlined"
+                            size="small"
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Search />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            className="searchOne"
+                        onChange={searchHandler}
+                        />
+                    </Box>
                     <Box
                         sx={{
                             display: 'flex',
@@ -334,6 +392,14 @@ const TaskList = () => {
                     />
                 </div>
             </Box>
+
+            <DeleteModel
+                open={deleteConfirmOpen}
+                onClose={() => setDeleteConfirmOpen(false)}
+                onConfirm={confirmDelete}
+            />
+
+
             <ToastContainer />
         </>
     );
