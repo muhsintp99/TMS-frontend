@@ -98,7 +98,7 @@ const TaskList = () => {
             .then(() => {
                 fetchTasks();
                 console.log('Task Deleted Successfully');
-                toast.success('Task Deleted Successfully'); 
+                toast.success('Task Deleted Successfully');
             })
             .catch((err) => console.log('Delete Error', err));
     };
@@ -325,7 +325,13 @@ const TaskList = () => {
                 </Box>
 
                 <div style={{ minWidth: '900px' }}>
-                    <DataTable columns={columns} data={data} pagination />
+                    <DataTable
+                        columns={columns}
+                        data={data}
+                        pagination
+                        paginationPerPage={4}
+                        paginationRowsPerPageOptions={[4, 10, 20]}
+                    />
                 </div>
             </Box>
             <ToastContainer />
