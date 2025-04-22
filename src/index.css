@@ -4,8 +4,8 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* color: rgba(255, 255, 255, 0.87); */
+  /* background-color: #242424; */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,10 +13,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
+* {
   margin: 0;
   padding: 0;
-  background-color: var(background-color);
+  /* background-color: var(background-color); */
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  padding: 30px;
+  /* background-color: var(background-color); */
   box-sizing: border-box;
 }
 

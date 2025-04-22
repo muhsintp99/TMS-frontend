@@ -1,9 +1,9 @@
 import {all , call } from 'redux-saga/effects';
 
-import { watchFetchTasks } from '../container/taskSaga';
+import { watchTasks } from '../container/taskSaga';
 
 export default function* rootSaga() {
     yield all([
-        call(watchFetchTasks),
+        call(watchTasks),
     ]);
 }
